@@ -10,6 +10,7 @@ class MoviesController < ApplicationController
     @order_attribute = params[:order]
     @selected_ratings = params[:ratings]
     if (@selected_ratings.nil? || @selected_ratings.keys.empty?)
+      @selected_ratings = {}
       @movies = []
     else
       @movies = Movie.order(@order_attribute).where(:rating => @selected_ratings.keys).all
