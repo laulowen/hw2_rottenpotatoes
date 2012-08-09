@@ -7,11 +7,19 @@ class MoviesController < ApplicationController
   end
 
   def index
-    order_criteria = params[:order]
-    @movies = Movie.order(order_criteria).all
-    @title_header_class = order_criteria == 'title' ? 'hilite' : 'normal'
-    @release_date_header_class = order_criteria == 'release_date' ? 'hilite' : 'normal'
+    @order_attribute = params[:order]
+    @selected_ratings = params[:ratings]
+    if (@selected_ratings.nil? || @selected_ratings.keys.empty?)
+      @movies = []
+    else
+      @movies = Movie.order(@order_attribute).where(:rating => @selected_ratings.keys).all
     end
+
+    @title_header_class = @order_attribute == 'title' ? 'hilite' : 'normal'
+    @release_date_header_class = @order_attribute == 'release_date' ? 'hilite' : 'normal'
+
+    @all_ratings = Movie.all_ratings
+  end
 
   def new
     # default: render 'new' template
