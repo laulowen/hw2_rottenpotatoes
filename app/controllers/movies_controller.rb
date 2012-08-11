@@ -7,10 +7,12 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @order_attribute = params[:order]
-    @selected_ratings = params[:ratings]
-    if (@selected_ratings.nil? || @selected_ratings.keys.empty?)
-      @selected_ratings = {}
+    session[:ratings] ||= {}
+
+    session[:order] = @order_attribute = params.has_key?(:order) ? params[:order] : session[:order]
+    session[:ratings] = @selected_ratings = params.has_key?(:ratings) ? params[:ratings] : session[:ratings]
+
+    if (@selected_ratings.empty?)
       @movies = []
     else
       @movies = Movie.order(@order_attribute).where(:rating => @selected_ratings.keys).all
@@ -20,6 +22,11 @@ class MoviesController < ApplicationController
     @release_date_header_class = @order_attribute == 'release_date' ? 'hilite' : 'normal'
 
     @all_ratings = Movie.all_ratings
+
+    if (session[:order] && !params.has_key?(:order))
+      flash.keep
+      redirect_to movies_path(:order => @order_attribute, :ratings => @selected_ratings)
+    end
   end
 
   def new
